@@ -27,3 +27,15 @@ public function createLabel(string topic, string description) returns int {
     }
 }
 
+public function isValidLabel(string name) returns int {
+
+    http:Request request = new;
+    request.addHeader("Authorization", ACCESS_TOKEN);
+    string url = "/repos/" + ORANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels/" + name;
+    http:Response | error githubResponse = githubAPIEndpoint->post(url, request);
+    if (githubResponse is http:Response) {
+        return githubResponse.statusCode;
+    } else {
+        return http:STATUS_BAD_REQUEST;
+    }
+}
