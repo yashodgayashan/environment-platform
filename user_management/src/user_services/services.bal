@@ -20,7 +20,7 @@ service userService on endPoint {
         methods: ["POST"],
         path: "/post-request/{userName}"
     }
-    resource function getRequestRelatedToUser(http:Caller caller, http:Request request, string userName) returns @untainted error? {
+    resource function postRequest(http:Caller caller, http:Request request, string userName) returns @untainted error? {
 
         http:Response response = new;
         var payload = request.getJsonPayload();
@@ -44,6 +44,24 @@ service userService on endPoint {
         } else {
             response.statusCode = http:STATUS_BAD_REQUEST;
             response.setJsonPayload({"Message": "Invalid payload"});
+        }
+        error? result = caller->respond(response);
+    }
+
+    @http:ResourceConfig {
+        methods: ["GET"],
+        path: "/get-requests/{userName}"
+    }
+    resource function getRequestRelatedToUser(http:Caller caller, http:Request request, string userName) returns @untainted error? {
+
+        http:Response response = new;
+        json[] | error issues = utilities:getUserIssues(userName);
+        if (issues is json[]) {
+            response.statusCode = http:STATUS_OK;
+            response.setJsonPayload(issues);
+        } else {
+            response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
+            response.setJsonPayload({"Message": "Internal server error"});
         }
         error? result = caller->respond(response);
     }
