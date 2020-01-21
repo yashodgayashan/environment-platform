@@ -1,6 +1,8 @@
 import ballerina/crypto;
+import ballerina/http;
 import ballerina/io;
 import ballerina/jwt;
+// import ballerina/log;
 import ballerina/time;
 
 crypto:KeyStore keyStore = {
@@ -14,20 +16,52 @@ jwt:JwtKeyStoreConfig config = {
     keyPassword: "ballerina"
 };
 
+jwt:InboundJwtAuthProvider jwtAuthProvider = new ({
+    issuer: "wso2",
+    audience: "ballerina",
+    trustStoreConfig: {
+        certificateAlias: "ballerina",
+        trustStore: {
+            path: "dependencies/security/ballerinaTruststore.p12",
+            password: "ballerina"
+        }
+    }
+});
+
+http:BearerAuthHandler jwtAuthHandler = new (jwtAuthProvider);
+
+
+listener http:Listener endPoint = new (USER_SERVICES_PORT);
+
+@http:ServiceConfig {
+    basePath: BASEPATH,
+    cors: {
+        allowOrigins: ["*"]
+    }
+}
+service userService on endPoint {
+
+    @http:ResourceConfig {
+        methods: ["GET"],
+        path: "/sayHello"
+    }
+    resource function hello(http:Caller caller, http:Request req) {
+        error? result = caller->respond("Hello, World!!!");
+    }
+}
 
 public function main() {
-
+    error | boolean code = createTable();
     jwt:JwtHeader header = {};
     header.alg = jwt:RS256;
     header.typ = "JWT";
 
     jwt:JwtPayload payload = {};
     payload.sub = "John";
-    payload.iss = "mit_iap";
-    payload.jti = "100078234ba23";
+    payload.iss = "wso2";
     payload.aud = ["ballerina", "ballerinaSamples"];
-    payload.exp = time:currentTime().time / 1000 + 600;
-
+    payload.exp = time:currentTime().time / 1000 + 3600;
     string | error jwt = jwt:issueJwt(header, payload, config);
-    io:println(jwt);
+    io:print(jwt);
 }
+
