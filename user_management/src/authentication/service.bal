@@ -52,6 +52,7 @@ service userService on endPoint {
 
 public function main() {
     error | boolean code = createTable();
+    error | boolean err = insertStudent("yashod", "perera", "yashodgayashan@gmail.com", 772424889, "no 404, Bambukuliya kochchikade", "testPassword");
     jwt:JwtHeader header = {};
     header.alg = jwt:RS256;
     header.typ = "JWT";
