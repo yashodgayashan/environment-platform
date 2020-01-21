@@ -88,6 +88,36 @@ service userService on endPoint {
         error? result = caller->respond(response);
     }
 
+    @http:ResourceConfig {
+        methods: ["POST"],
+        path: "/register-authority"
+    }
+    resource function registerAuthority(http:Caller caller, http:Request req) returns @untainted error? {
+
+        http:Response response = new;
+        var payload = req.getJsonPayload();
+
+        if (payload is json) {
+            [string, string, string, int, string, string][firstName, lastName, email, phoneNumber, address, password] = check checkUser(payload);
+            error | boolean user = insertUser(firstName, lastName, email, phoneNumber, address, password, "authority");
+            if (user is error) {
+                response.statusCode = http:STATUS_CONFLICT;
+                response.setJsonPayload({"Message": <@untainted>user.reason()});
+            } else {
+                if (user) {
+                    response.statusCode = http:STATUS_CREATED;
+                    response.setJsonPayload({"Message": "Successfully added"});
+                } else {
+                    response.statusCode = http:STATUS_FORBIDDEN;
+                    response.setJsonPayload({"Message": "Cannot create the user"});
+                }
+            }
+        } else {
+            response.statusCode = http:STATUS_BAD_REQUEST;
+            response.setJsonPayload({"Message": "Invalid Json Payload"});
+        }
+        error? result = caller->respond(response);
+    }
 }
 
 
