@@ -1,0 +1,10 @@
+[2020-01-21 17:58:24,297] SEVERE {b7a.log.crash} - org.ballerinalang.jvm.values.ErrorValue cannot be cast to org.ballerinalang.jvm.values.ArrayValue 
+java.lang.ClassCastException: org.ballerinalang.jvm.values.ErrorValue cannot be cast to org.ballerinalang.jvm.values.ArrayValue
+	at yashodperera.authentication.$value$userService__service_0.register(service.bal:38)
+	at yashodperera.authentication.$value$userService__service_0.call(service.bal)
+	at org.ballerinalang.jvm.values.connector.Executor.lambda$submit$0(Executor.java:76)
+	at org.ballerinalang.jvm.scheduling.SchedulerItem.execute(Scheduler.java:426)
+	at org.ballerinalang.jvm.scheduling.Scheduler.run(Scheduler.java:218)
+	at org.ballerinalang.jvm.scheduling.Scheduler.runSafely(Scheduler.java:191)
+	at java.lang.Thread.run(Thread.java:745)
+ 
