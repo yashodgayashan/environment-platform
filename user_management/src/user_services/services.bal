@@ -63,6 +63,35 @@ service userService on endPoint {
             response.statusCode = http:STATUS_INTERNAL_SERVER_ERROR;
             response.setJsonPayload({"Message": "Internal server error"});
         }
+
         error? result = caller->respond(response);
     }
+
+    @http:ResourceConfig {
+        methods: ["POST"],
+        path: "/post-comment/{issueNumber}"
+    }
+    resource function postComment(http:Caller caller, http:Request request, string issueNumber) returns @untainted error? {
+
+        http:Response response = new;
+        var payload = request.getJsonPayload();
+        if (payload is json) {
+            json body = check payload.body;
+            int status = utilities:comment(<@untainted>issueNumber, <@untainted><string>body);
+            if (status == http:STATUS_CREATED) {
+                response.statusCode = http:STATUS_OK;
+                response.setJsonPayload({"Message": "Successfully added"});
+            } else {
+                response.statusCode = http:STATUS_BAD_REQUEST;
+                response.setJsonPayload({"Message": "Issue is not available"});
+            }
+
+        } else {
+            response.statusCode = http:STATUS_BAD_REQUEST;
+            response.setJsonPayload({"Message": "Invalid payload"});
+        }
+        error? result = caller->respond(response);
+    }
+
+
 }
