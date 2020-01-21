@@ -1,9 +1,7 @@
 import ballerina/crypto;
 import ballerina/http;
-import ballerina/io;
 import ballerina/jwt;
 // import ballerina/log;
-import ballerina/time;
 
 crypto:KeyStore keyStore = {
     path: "dependencies/security/ballerinaKeystore.p12",
@@ -118,25 +116,30 @@ service userService on endPoint {
         }
         error? result = caller->respond(response);
     }
+    @http:ResourceConfig {
+        methods: ["GET"],
+        path: "/login"
+    }
+    resource function login(http:Caller caller, http:Request req) returns @untainted error? {
+
+        http:Response response = new;
+        var payload = req.getJsonPayload();
+
+        if (payload is json){
+            json email = check payload.email;
+            json password = check payload.password;
+            User | error user = getUser(<string>email,<string>password);
+            if (user is User) {
+                response.statusCode = http:STATUS_OK;
+                response.setJsonPayload({"user": <@untainted>user.userType});
+            } else {
+            response.statusCode = http:STATUS_NOT_FOUND;
+            response.setJsonPayload({"Message":<@untainted> user.reason()});
+            }
+        } else {
+            response.statusCode = http:STATUS_BAD_REQUEST;
+            response.setJsonPayload({"Message": "Invalid Json Payload"});
+        }
+        error? result = caller->respond(response);
+    }
 }
-
-
-public function main() {
-    error | boolean code = createTable();
-    error | boolean us = insertUser("yashod", "gayashan", "yashodgayashan@gmail.com", 772424889, "no 4040, Bambukuliya kochchikade", "testPassword", "user");
-
-    User | error usr = getUser("yashodgayashan@gmail.com", "testPassword");
-    io:print(usr);
-    jwt:JwtHeader header = {};
-    header.alg = jwt:RS256;
-    header.typ = "JWT";
-
-    jwt:JwtPayload payload = {};
-    payload.sub = "John";
-    payload.iss = "wso2";
-    payload.aud = ["ballerina", "ballerinaSamples"];
-    payload.exp = time:currentTime().time / 1000 + 3600;
-    string | error jwt = jwt:issueJwt(header, payload, config);
-// io:print(jwt);
-}
-
