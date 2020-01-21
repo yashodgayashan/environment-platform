@@ -3,9 +3,7 @@ import ballerina/http;
 import ballerina/io;
 import ballerina/jwt;
 // import ballerina/log;
-import ballerina/lang.'int as ints;
 import ballerina/time;
-
 
 crypto:KeyStore keyStore = {
     path: "dependencies/security/ballerinaKeystore.p12",
@@ -32,7 +30,7 @@ service userService on endPoint {
         methods: ["POST"],
         path: "/register-user"
     }
-    resource function register(http:Caller caller, http:Request req) returns @untainted error? {
+    resource function registerUser(http:Caller caller, http:Request req) returns @untainted error? {
 
         http:Response response = new;
         var payload = req.getJsonPayload();
@@ -58,17 +56,40 @@ service userService on endPoint {
         }
         error? result = caller->respond(response);
     }
+
+    @http:ResourceConfig {
+        methods: ["POST"],
+        path: "/register-admin"
+    }
+    resource function registerAdmin(http:Caller caller, http:Request req) returns @untainted error? {
+
+        http:Response response = new;
+        var payload = req.getJsonPayload();
+
+        if (payload is json) {
+            [string, string, string, int, string, string][firstName, lastName, email, phoneNumber, address, password] = check checkUser(payload);
+            error | boolean user = insertUser(firstName, lastName, email, phoneNumber, address, password, "admin");
+            if (user is error) {
+                response.statusCode = http:STATUS_CONFLICT;
+                response.setJsonPayload({"Message": <@untainted>user.reason()});
+            } else {
+                if (user) {
+                    response.statusCode = http:STATUS_CREATED;
+                    response.setJsonPayload({"Message": "Successfully added"});
+                } else {
+                    response.statusCode = http:STATUS_FORBIDDEN;
+                    response.setJsonPayload({"Message": "Cannot create the user"});
+                }
+            }
+        } else {
+            response.statusCode = http:STATUS_BAD_REQUEST;
+            response.setJsonPayload({"Message": "Invalid Json Payload"});
+        }
+        error? result = caller->respond(response);
+    }
+
 }
 
-public function checkUser(json payload) returns error | [string, string, string, int, string, string] {
-    json firstName = check payload.firstName;
-    json lastName = check payload.lastName;
-    json email = check payload.email;
-    json phoneNumber = check payload.phoneNumber;
-    json address = check payload.address;
-    json password = check payload.password;
-    return [<string>firstName, <string>lastName, <string>email,check ints:fromString(<string>phoneNumber), <string>address, <string>password];
-}
 
 public function main() {
     error | boolean code = createTable();
