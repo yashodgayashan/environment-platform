@@ -1,5 +1,4 @@
 import ballerina/http;
-import ballerina/io;
 
 http:Client githubAPIEndpoint = new (GITHUB_API_URL);
 
@@ -22,11 +21,10 @@ public function createLabel(string topic, string description) returns int {
 
     http:Response | error githubResponse = githubAPIEndpoint->post(url, request);
     if (githubResponse is http:Response) {
-        io:println(githubResponse.statusCode);
+        return githubResponse.statusCode;
     } else {
-        io:println(githubResponse);
+        return http:STATUS_BAD_REQUEST;
     }
-    return 1;
 }
 
 public function postIssue(string issueTitle, string issueBody, string userName) returns int {
@@ -40,13 +38,8 @@ public function postIssue(string issueTitle, string issueBody, string userName) 
     string url = "/repos/" + ORANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues";
     http:Response | error githubResponse = githubAPIEndpoint->post(url, request);
     if (githubResponse is http:Response) {
-        io:println(githubResponse.statusCode);
+        return githubResponse.statusCode;
     } else {
-        io:println(githubResponse);
+        return http:STATUS_BAD_REQUEST;
     }
-    return 1;
-}
-
-public function main() {
-    int test = postIssue("test", "test", "yaashod");
 }
