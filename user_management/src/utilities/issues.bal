@@ -109,6 +109,6 @@ public function getAllIssues() returns @untainted json[] | error {
 }
 
 public function main() {
-    int ret = addCollaborator("deshankoswatte");
+    string[] | error ret = getCollaborators();
     io:println(ret);
 }

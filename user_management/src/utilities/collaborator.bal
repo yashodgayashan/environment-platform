@@ -29,3 +29,26 @@ public function removeCollaborator(string userName) returns int {
         return http:STATUS_BAD_REQUEST;
     }
 }
+
+public function getCollaborators() returns @untainted string[] | error {
+
+    http:Request request = new;
+    request.addHeader("Authorization", ACCESS_TOKEN);
+    string url = "/repos/" + ORANIZATION_NAME + "/" + REPOSITORY_NAME + "/collaborators";
+    http:Response | error githubResponse = githubAPIEndpoint->get(url, request);
+    string[] names = [];
+    if (githubResponse is http:Response) {
+        var payload = githubResponse.getJsonPayload();
+        if (payload is json) {
+            json[] collaborators = <json[]>payload;
+            foreach json collaborator in collaborators {
+                names[names.length()] = <string>collaborator.login;
+            }
+            return names;
+        } else {
+            return error("Invalid payload type");
+        }
+    } else {
+        return error("Internal server error");
+    }
+}
