@@ -80,3 +80,16 @@ public function isCommentOwner(string commentId, string userName) returns int {
         return http:STATUS_SERVICE_UNAVAILABLE;
     }
 }
+
+public function deleteComment(string commentId) returns int {
+
+    http:Request request = new;
+    request.addHeader("Authorization", ACCESS_TOKEN);
+    string url = "/repos/" + ORANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/comments/" + commentId;
+    http:Response | error githubResponse = githubAPIEndpoint->delete(url, request);
+    if (githubResponse is http:Response) {
+        return githubResponse.statusCode;
+    } else {
+        return http:STATUS_INTERNAL_SERVER_ERROR;
+    }
+}

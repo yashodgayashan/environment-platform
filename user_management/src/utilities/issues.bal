@@ -61,6 +61,6 @@ public function getUserIssues(string userName) returns @untainted json[] | error
 }
 
 public function main() {
-    int ret = editComments("57671846335", "yashodgayashan");
+    int ret = deleteComment("576718465");
     io:println(ret);
 }
