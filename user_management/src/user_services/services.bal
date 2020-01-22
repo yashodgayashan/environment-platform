@@ -87,7 +87,6 @@ service userService on endPoint {
                     response.statusCode = http:STATUS_BAD_REQUEST;
                     response.setJsonPayload({"Message": "Issue is not available"});
                 }
-
             } else {
                 response.statusCode = http:STATUS_BAD_REQUEST;
                 response.setJsonPayload({"Message": "Invalid payload"});
@@ -121,6 +120,37 @@ service userService on endPoint {
             response.statusCode = http:STATUS_BAD_REQUEST;
             response.setJsonPayload({"Message": "Invalid user"});
         }
+        error? result = caller->respond(response);
+    }
+
+    @http:ResourceConfig {
+        methods: ["PATCH"],
+        path: "/edit-comments/{userName}/{commentId}"
+    }
+    resource function editComment(http:Caller caller, http:Request request, string userName, string commentId) returns @untainted error? {
+
+        http:Response response = new;
+        var payload = request.getJsonPayload();
+        int statusCode = utilities:isCommentOwner(<@untainted > commentId, <@untainted >userName);
+        if (payload is json){
+            if (statusCode == http:STATUS_OK) {
+                json body =check  payload.body;
+                int status = utilities:editComments(<@untainted >commentId,<@untainted ><string>body);
+                if (status == http:STATUS_OK){
+                    response.statusCode = http:STATUS_OK;
+                     response.setJsonPayload({"Message": "Successfully added"});
+                } else {   
+                    response.statusCode = http:STATUS_BAD_REQUEST;
+                    response.setJsonPayload({"Message": "Comment is not available"});
+                }
+        } else {
+            response.statusCode = http:STATUS_BAD_REQUEST;
+            response.setJsonPayload({"Message": "Invalid user"});
+        }
+         } else {
+                response.statusCode = http:STATUS_BAD_REQUEST;
+                response.setJsonPayload({"Message": "Invalid payload"});
+            }
         error? result = caller->respond(response);
     }
 }
