@@ -27,15 +27,28 @@ public function createLabel(string topic, string description) returns int {
     }
 }
 
-public function isValidLabel(string name) returns int {
+public function isValidLabel(string name, string issueNumber) returns int {
 
     http:Request request = new;
     request.addHeader("Authorization", ACCESS_TOKEN);
-    string url = "/repos/" + ORANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels/" + name;
-    http:Response | error githubResponse = githubAPIEndpoint->post(url, request);
+    string url = "/repos/" + ORANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/labels";
+    http:Response | error githubResponse = githubAPIEndpoint->get(url, request);
     if (githubResponse is http:Response) {
-        return githubResponse.statusCode;
+        var payload = githubResponse.getJsonPayload();
+        if (payload is json) {
+            json[] labels = <json[]>payload;
+            foreach json label in labels {
+                if (name == label.name) {
+                    return http:STATUS_OK;
+                }
+            }
+            return http:STATUS_NOT_FOUND;
+        } else {
+            return http:STATUS_SERVICE_UNAVAILABLE;
+        }
     } else {
         return http:STATUS_BAD_REQUEST;
     }
 }
+
+

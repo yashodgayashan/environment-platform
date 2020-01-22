@@ -69,29 +69,58 @@ service userService on endPoint {
 
     @http:ResourceConfig {
         methods: ["POST"],
-        path: "/post-comment/{issueNumber}"
+        path: "/post-comment/{issueNumber}/{userName}"
     }
-    resource function postComment(http:Caller caller, http:Request request, string issueNumber) returns @untainted error? {
+    resource function postComment(http:Caller caller, http:Request request, string issueNumber, string userName) returns @untainted error? {
 
         http:Response response = new;
         var payload = request.getJsonPayload();
-        if (payload is json) {
-            json body = check payload.body;
-            int status = utilities:comment(<@untainted>issueNumber, <@untainted><string>body);
-            if (status == http:STATUS_CREATED) {
-                response.statusCode = http:STATUS_OK;
-                response.setJsonPayload({"Message": "Successfully added"});
+        int statusCode = utilities:isValidLabel(<@untainted>userName,<@untainted >issueNumber);
+        if (statusCode == http:STATUS_OK) {
+            if (payload is json) {
+                json body = check payload.body;
+                int status = utilities:comment(<@untainted>issueNumber, <@untainted><string>body);
+                if (status == http:STATUS_CREATED) {
+                    response.statusCode = http:STATUS_OK;
+                    response.setJsonPayload({"Message": "Successfully added"});
+                } else {
+                    response.statusCode = http:STATUS_BAD_REQUEST;
+                    response.setJsonPayload({"Message": "Issue is not available"});
+                }
+
             } else {
                 response.statusCode = http:STATUS_BAD_REQUEST;
-                response.setJsonPayload({"Message": "Issue is not available"});
+                response.setJsonPayload({"Message": "Invalid payload"});
             }
-
         } else {
             response.statusCode = http:STATUS_BAD_REQUEST;
-            response.setJsonPayload({"Message": "Invalid payload"});
+            response.setJsonPayload({"Message": "Invalid user"});
         }
         error? result = caller->respond(response);
     }
 
+    @http:ResourceConfig {
+        methods: ["GET"],
+        path: "/get-comments/{issueNumber}/{userName}"
+    }
+    resource function getComments(http:Caller caller, http:Request request, string issueNumber, string userName) returns @untainted error? {
 
+        http:Response response = new;
+        var payload = request.getJsonPayload();
+        int statusCode = utilities:isValidLabel(<@untainted>userName, <@untainted >issueNumber);
+        if (statusCode == http:STATUS_OK) {
+                json[] | error status = utilities:getComments(<@untainted >issueNumber);
+                if (status is json[]) {
+                    response.statusCode = http:STATUS_OK;
+                    response.setJsonPayload(status);
+                } else {
+                    response.statusCode = http:STATUS_BAD_REQUEST;
+                    response.setJsonPayload({"Message": status.reason()});
+                }
+        } else {
+            response.statusCode = http:STATUS_BAD_REQUEST;
+            response.setJsonPayload({"Message": "Invalid user"});
+        }
+        error? result = caller->respond(response);
+    }
 }

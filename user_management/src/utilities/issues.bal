@@ -61,8 +61,6 @@ public function getUserIssues(string userName) returns @untainted json[] | error
 }
 
 public function main() {
-    int ret = isValidLabel("yashod");
+    int ret = editComments("57671846335", "yashodgayashan");
     io:println(ret);
-    int reti = isValidLabel("yash");
-    io:println(reti);
 }
