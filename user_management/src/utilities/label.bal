@@ -51,4 +51,26 @@ public function isValidLabel(string name, string issueNumber) returns int {
     }
 }
 
+public function getLables() returns @untainted json[] | error {
 
+    http:Request request = new;
+    request.addHeader("Authorization", ACCESS_TOKEN);
+    string url = "/repos/" + ORANIZATION_NAME + "/" + REPOSITORY_NAME + "/labels";
+    http:Response | error githubResponse = githubAPIEndpoint->get(url, request);
+
+    json[] out = [];
+    if (githubResponse is http:Response) {
+        var payload = githubResponse.getJsonPayload();
+        if (payload is json) {
+            json[] labels = <json[]>payload;
+            foreach json label in labels {
+                out[out.length()] = {"id":check label.id, "name":check label.name, "description":check label.description};
+            }
+            return out;
+        } else {
+            return error("Invalid payload");
+        }
+    } else {
+        return error("Internal server error");
+    }
+}
