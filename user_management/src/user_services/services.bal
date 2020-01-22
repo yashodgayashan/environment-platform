@@ -1,8 +1,5 @@
-// import utilities;
 import ballerina/http;
 import yashodperera/utilities;
-// import ballerina/lang.'int as ints;
-// import ballerina/log;
 
 http:Client githubAPIEndpoint = new (GITHUB_API_URL);
 
