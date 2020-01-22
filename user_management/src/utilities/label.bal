@@ -90,3 +90,16 @@ public function assignLabel(string issueNumber, string label) returns int {
         return http:STATUS_BAD_REQUEST;
     }
 }
+
+public function removeLabel(string issueNumber, string labelName) returns int {
+
+    http:Request request = new;
+    request.addHeader("Authorization", ACCESS_TOKEN);
+    string url = "/repos/" + ORANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/labels/" + labelName;
+    http:Response | error githubResponse = githubAPIEndpoint->delete(url, request);
+    if (githubResponse is http:Response) {
+        return githubResponse.statusCode;
+    } else {
+        return http:STATUS_BAD_REQUEST;
+    }
+}
