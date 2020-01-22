@@ -74,3 +74,19 @@ public function getLables() returns @untainted json[] | error {
         return error("Internal server error");
     }
 }
+
+public function assignLabel(string issueNumber, string label) returns int {
+
+    http:Request request = new;
+    request.addHeader("Authorization", ACCESS_TOKEN);
+    request.setJsonPayload({
+        "labels": [label]
+    });
+    string url = "/repos/" + ORANIZATION_NAME + "/" + REPOSITORY_NAME + "/issues/" + issueNumber + "/labels";
+    http:Response | error githubResponse = githubAPIEndpoint->post(url, request);
+    if (githubResponse is http:Response) {
+        return githubResponse.statusCode;
+    } else {
+        return http:STATUS_BAD_REQUEST;
+    }
+}
