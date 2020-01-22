@@ -36,7 +36,8 @@ public function getUserIssues(string userName) returns @untainted json[] | error
             foreach json issue in issues {
                 json[] labels = <json[]>issue.labels;
                 foreach json label in labels {
-                    if (label.name == userName) {
+                    if (label.name == userName && label.description == "userName") {
+                        hasState = false;
                         foreach json labelName in labels {
                             if (labelName.description == "state") {
                                 state = <string>labelName.name;
@@ -48,7 +49,6 @@ public function getUserIssues(string userName) returns @untainted json[] | error
                         } else {
                             out[out.length()] = {"requsetTitle":check issue.title, "requestNumber":check issue.number, "requestDetails":check issue.body, "state": "Pending"};
                         }
-                        hasState = false;
                     }
                 }
             }
