@@ -75,7 +75,7 @@ service userService on endPoint {
 
         http:Response response = new;
         var payload = request.getJsonPayload();
-        int statusCode = utilities:isValidLabel(<@untainted>userName,<@untainted >issueNumber);
+        int statusCode = utilities:isValidLabel(<@untainted>userName, <@untainted>issueNumber);
         if (statusCode == http:STATUS_OK) {
             if (payload is json) {
                 json body = check payload.body;
@@ -106,16 +106,16 @@ service userService on endPoint {
 
         http:Response response = new;
         var payload = request.getJsonPayload();
-        int statusCode = utilities:isValidLabel(<@untainted>userName, <@untainted >issueNumber);
+        int statusCode = utilities:isValidLabel(<@untainted>userName, <@untainted>issueNumber);
         if (statusCode == http:STATUS_OK) {
-                json[] | error status = utilities:getComments(<@untainted >issueNumber);
-                if (status is json[]) {
-                    response.statusCode = http:STATUS_OK;
-                    response.setJsonPayload(status);
-                } else {
-                    response.statusCode = http:STATUS_BAD_REQUEST;
-                    response.setJsonPayload({"Message": status.reason()});
-                }
+            json[] | error status = utilities:getComments(<@untainted>issueNumber);
+            if (status is json[]) {
+                response.statusCode = http:STATUS_OK;
+                response.setJsonPayload(status);
+            } else {
+                response.statusCode = http:STATUS_BAD_REQUEST;
+                response.setJsonPayload({"Message": status.reason()});
+            }
         } else {
             response.statusCode = http:STATUS_BAD_REQUEST;
             response.setJsonPayload({"Message": "Invalid user"});
@@ -125,32 +125,58 @@ service userService on endPoint {
 
     @http:ResourceConfig {
         methods: ["PATCH"],
-        path: "/edit-comments/{userName}/{commentId}"
+        path: "/edit-comment/{userName}/{commentId}"
     }
     resource function editComment(http:Caller caller, http:Request request, string userName, string commentId) returns @untainted error? {
 
         http:Response response = new;
         var payload = request.getJsonPayload();
-        int statusCode = utilities:isCommentOwner(<@untainted > commentId, <@untainted >userName);
-        if (payload is json){
+        int statusCode = utilities:isCommentOwner(<@untainted>commentId, <@untainted>userName);
+        if (payload is json) {
             if (statusCode == http:STATUS_OK) {
-                json body =check  payload.body;
-                int status = utilities:editComments(<@untainted >commentId,<@untainted ><string>body);
-                if (status == http:STATUS_OK){
+                json body = check payload.body;
+                int status = utilities:editComments(<@untainted>commentId, <@untainted><string>body);
+                if (status == http:STATUS_OK) {
                     response.statusCode = http:STATUS_OK;
-                     response.setJsonPayload({"Message": "Successfully added"});
-                } else {   
+                    response.setJsonPayload({"Message": "Successfully added"});
+                } else {
                     response.statusCode = http:STATUS_BAD_REQUEST;
                     response.setJsonPayload({"Message": "Comment is not available"});
                 }
+            } else {
+                response.statusCode = http:STATUS_BAD_REQUEST;
+                response.setJsonPayload({"Message": "Invalid user or comment"});
+            }
         } else {
             response.statusCode = http:STATUS_BAD_REQUEST;
-            response.setJsonPayload({"Message": "Invalid user"});
+            response.setJsonPayload({"Message": "Invalid payload"});
         }
-         } else {
+        error? result = caller->respond(response);
+    }
+
+    @http:ResourceConfig {
+        methods: ["DELETE"],
+        path: "/delete-comment/{userName}/{commentId}"
+    }
+    resource function deleteComment(http:Caller caller, http:Request request, string userName, string commentId) returns @untainted error? {
+
+        http:Response response = new;
+        int statusCode = utilities:isCommentOwner(<@untainted>commentId, <@untainted>userName);
+
+        if (statusCode == http:STATUS_OK) {
+
+            int status = utilities:deleteComment(<@untainted>commentId);
+            if (status == http:STATUS_NO_CONTENT) {
+                response.statusCode = http:STATUS_OK;
+                response.setJsonPayload({"Message": "Successfully deleted"});
+            } else {
                 response.statusCode = http:STATUS_BAD_REQUEST;
-                response.setJsonPayload({"Message": "Invalid payload"});
+                response.setJsonPayload({"Message": "Comment is not available"});
             }
+        } else {
+            response.statusCode = http:STATUS_BAD_REQUEST;
+            response.setJsonPayload({"Message": "Invalid user or comment"});
+        }
         error? result = caller->respond(response);
     }
 }

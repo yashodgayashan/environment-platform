@@ -125,16 +125,16 @@ service userService on endPoint {
         http:Response response = new;
         var payload = req.getJsonPayload();
 
-        if (payload is json){
+        if (payload is json) {
             json email = check payload.email;
             json password = check payload.password;
-            User | error user = getUser(<string>email,<string>password);
+            User | error user = getUser(<string>email, <string>password);
             if (user is User) {
                 response.statusCode = http:STATUS_OK;
                 response.setJsonPayload({"user": <@untainted>user.userType});
             } else {
-            response.statusCode = http:STATUS_NOT_FOUND;
-            response.setJsonPayload({"Message":<@untainted> user.reason()});
+                response.statusCode = http:STATUS_NOT_FOUND;
+                response.setJsonPayload({"Message": <@untainted>user.reason()});
             }
         } else {
             response.statusCode = http:STATUS_BAD_REQUEST;

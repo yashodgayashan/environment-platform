@@ -41,6 +41,7 @@ public function getComments(string issueNumber) returns @untainted json[] | erro
     }
 }
 
+//200
 public function editComments(string commentId, string body) returns int {
 
     http:Request request = new;
@@ -67,10 +68,15 @@ public function isCommentOwner(string commentId, string userName) returns int {
     if (githubResponse is http:Response) {
         var payload = githubResponse.getJsonPayload();
         if (payload is json) {
-            map<json> user = <map<json>>payload.user;
-            if (user.login == userName) {
-                return http:STATUS_OK;
-            } else {
+            map<json> | error user = trap <map<json>>payload.user;
+            if (user is map<json>) {
+                if (user.login == userName) {
+                    return http:STATUS_OK;
+                } else {
+                    return http:STATUS_NOT_FOUND;
+                }
+            }
+            else {
                 return http:STATUS_NOT_FOUND;
             }
         } else {
@@ -81,6 +87,7 @@ public function isCommentOwner(string commentId, string userName) returns int {
     }
 }
 
+//204 - deleted  or 404
 public function deleteComment(string commentId) returns int {
 
     http:Request request = new;
