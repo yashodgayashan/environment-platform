@@ -109,6 +109,6 @@ public function getAllIssues() returns @untainted json[] | error {
 }
 
 public function main() {
-    string[] | error ret = getCollaborators();
+    int ret = removeLabel("21", "yashod");
     io:println(ret);
 }

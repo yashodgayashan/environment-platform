@@ -8,3 +8,47 @@ java.lang.ClassCastException: org.ballerinalang.jvm.values.ErrorValue cannot be 
 	at org.ballerinalang.jvm.scheduling.Scheduler.runSafely(Scheduler.java:191)
 	at java.lang.Thread.run(Thread.java:745)
  
+[2020-01-23 11:15:00,772] SEVERE {b7a.log.crash} - java.nio.file.NoSuchFileException: /Users/yashodperera/Documents/MIT IAP/environment-platform/user_management/target/caches/bir_cache/yashodperera/user_services/0.1.0/user_services.bir 
+org.ballerinalang.jvm.util.exceptions.BallerinaException: java.nio.file.NoSuchFileException: /Users/yashodperera/Documents/MIT IAP/environment-platform/user_management/target/caches/bir_cache/yashodperera/user_services/0.1.0/user_services.bir
+	at org.ballerinalang.compiler.backend.jvm.ReadFileFully.readFileFully(ReadFileFully.java:51)
+	at ballerina.compiler_backend_jvm.jvm_package_gen.readFileFully(jvm_package_gen.bal:685)
+	at ballerina.compiler_backend_jvm.main.generateJarBinary(main.bal:76)
+	at ballerina.compiler_backend_jvm.main.main(main.bal:60)
+	at ballerina.compiler_backend_jvm.___init.$lambda$main$(compiler_backend_jvm)
+	at org.ballerinalang.jvm.scheduling.SchedulerItem.execute(Scheduler.java:426)
+	at org.ballerinalang.jvm.scheduling.Scheduler.run(Scheduler.java:218)
+	at org.ballerinalang.jvm.scheduling.Scheduler.runSafely(Scheduler.java:191)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: java.nio.file.NoSuchFileException: /Users/yashodperera/Documents/MIT IAP/environment-platform/user_management/target/caches/bir_cache/yashodperera/user_services/0.1.0/user_services.bir
+	at sun.nio.fs.UnixException.translateToIOException(UnixException.java:86)
+	at sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:102)
+	at sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:107)
+	at sun.nio.fs.UnixFileSystemProvider.newByteChannel(UnixFileSystemProvider.java:214)
+	at java.nio.file.Files.newByteChannel(Files.java:361)
+	at java.nio.file.Files.newByteChannel(Files.java:407)
+	at java.nio.file.Files.readAllBytes(Files.java:3152)
+	at org.ballerinalang.compiler.backend.jvm.ReadFileFully.readFileFully(ReadFileFully.java:49)
+	... 8 more
+ 
+[2020-01-23 11:15:00,790] SEVERE {b7a.log.crash} - java.nio.file.NoSuchFileException: /Users/yashodperera/Documents/MIT IAP/environment-platform/user_management/target/caches/bir_cache/yashodperera/user_services/0.1.0/user_services.bir 
+org.ballerinalang.jvm.util.exceptions.BallerinaException: java.nio.file.NoSuchFileException: /Users/yashodperera/Documents/MIT IAP/environment-platform/user_management/target/caches/bir_cache/yashodperera/user_services/0.1.0/user_services.bir
+	at org.ballerinalang.compiler.backend.jvm.ReadFileFully.readFileFully(ReadFileFully.java:51)
+	at ballerina.compiler_backend_jvm.jvm_package_gen.readFileFully(jvm_package_gen.bal:685)
+	at ballerina.compiler_backend_jvm.main.generateJarBinary(main.bal:76)
+	at ballerina.compiler_backend_jvm.main.main(main.bal:60)
+	at ballerina.compiler_backend_jvm.___init.$lambda$main$(compiler_backend_jvm)
+	at org.ballerinalang.jvm.scheduling.SchedulerItem.execute(Scheduler.java:426)
+	at org.ballerinalang.jvm.scheduling.Scheduler.run(Scheduler.java:218)
+	at org.ballerinalang.jvm.scheduling.Scheduler.runSafely(Scheduler.java:191)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: java.nio.file.NoSuchFileException: /Users/yashodperera/Documents/MIT IAP/environment-platform/user_management/target/caches/bir_cache/yashodperera/user_services/0.1.0/user_services.bir
+	at sun.nio.fs.UnixException.translateToIOException(UnixException.java:86)
+	at sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:102)
+	at sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:107)
+	at sun.nio.fs.UnixFileSystemProvider.newByteChannel(UnixFileSystemProvider.java:214)
+	at java.nio.file.Files.newByteChannel(Files.java:361)
+	at java.nio.file.Files.newByteChannel(Files.java:407)
+	at java.nio.file.Files.readAllBytes(Files.java:3152)
+	at org.ballerinalang.compiler.backend.jvm.ReadFileFully.readFileFully(ReadFileFully.java:49)
+	... 8 more
+ 
